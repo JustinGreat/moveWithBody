@@ -19,7 +19,7 @@ struct io_control_driver
 	struct device *io_control_device;
 	struct cdev *io_control_cdev;
 	dev_t  devno;
-	s8 speed_val;
+	signed char speed_val;
 };
 
 #define IO_MAN 0
@@ -34,7 +34,7 @@ static int io_control_open(struct inode *inode, struct file *file)
     return 0;
 }
 
-static void sw_gpio_setval(s8 val)
+static void sw_gpio_setval(signed char val)
 {
     for(int i=0;i<8;i++)
     {
@@ -202,6 +202,8 @@ static void __exit io_control_exit(void)
 {
 	printk(KERN_INFO "io_control_exit ok!\n");
 	
+        sw_gpio_req_free(GPIOH(15));
+        sw_gpio_req_free(GPIOH(14));
 	unregister_chrdev_region(io_driver->devno, 1);
 	cdev_del(io_driver->io_control_cdev);
 	device_destroy(io_driver->io_control_class, io_driver->devno);
