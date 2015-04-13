@@ -45,13 +45,13 @@ static void sw_gpio_setval(signed char val)
 
 static ssize_t io_control_read(struct file * file, const char __user * buf, size_t size, loff_t * ppos)
 {
-    char* snd;
-    if(0==sw_gpio_getval(GPIOD(7))&&0!=sw_gpio_getval(GPIOD(8)))
-        *snd='l';
-    else if(0==sw_gpio_getval(GPIOD(8))&&0!=sw_gpio_getval(GPIOD(7)))
-        *snd='r';
+    char snd[1];
+    if(0==sw_gpio_getdrvlevel(GPIOD(7))&&0!=sw_gpio_getdrvlevel(GPIOD(8)))
+        snd[0]='l';
+    else if(0==sw_gpio_getdrvlevel(GPIOD(8))&&0!=sw_gpio_getdrvlevel(GPIOD(7)))
+        snd[0]='r';
     else
-        *snd='w';
+        snd[0]='w';
     if(copy_to_user(buf, snd, 1))
     {
 	printk(KERN_ERR "fail  copy_to_user!\n");
@@ -62,13 +62,13 @@ static ssize_t io_control_read(struct file * file, const char __user * buf, size
 
 static ssize_t io_control_write(struct file * file, const char __user * buf, size_t size, loff_t * ppos)
 {
-    char* get;
+    char get[1];
     if(copy_from_user(get, buf, size))
     {
-		printk(KERN_ERR "failed to copy_from_user!\n");
-		return -EINVAL;
+	printk(KERN_ERR "failed to copy_from_user!\n");
+	return -EINVAL;
     }
-    sw_gpio_setval(*get);
+    sw_gpio_setval(get[0]);
     return size;
 }
 unsigned int io_control_poll(struct file *filp, poll_table *wait)
@@ -94,6 +94,14 @@ static void setup_cdev_init(void)
 	cdev_add(io_driver->io_control_cdev, io_driver->devno, 1);	
 }
 
+static void io_set_man(void)
+{
+    work_mode=IO_MAN;
+}
+static void io_set_net(void)
+{
+    work_mode=IO_NET;
+}
 static int __init io_control_init(void)
 {
 	int ret;
@@ -166,12 +174,12 @@ static int __init io_control_init(void)
         sw_gpio_setpull(GPIOD(9),1);              //Pull up
         sw_gpio_setcfg(GPIOH(14),GPIO_CFG_EINT);  //IRQ
         sw_gpio_setcfg(GPIOH(15),GPIO_CFG_EINT);  //IRQ
-        if(sw_gpio_req_request(GPIOH(14),TRIG_EDGE_POSITIVE,io_set_man,Null)<0)
+        if(sw_gpio_req_request(GPIOH(14),TRIG_EDGE_POSITIVE,io_set_man,NULL)<0)
         {
             printk(KERN_INFO"Register IRQ failed!\n");
             goto irq_err_1;
 
-        if(sw_gpio_req_request(GPIOH(15),TRIG_EDGE_POSITIVE,io_set_net,Null)<0)
+        if(sw_gpio_req_request(GPIOH(15),TRIG_EDGE_POSITIVE,io_set_net,NULL)<0)
         {
             printk(KERN_INFO"Register IRQ failed!\n");
             goto irq_err_2;
@@ -189,14 +197,6 @@ class_err:
 register_err:
 	kfree(io_driver);
 	return ret;	
-}
-static void io_set_man(void)
-{
-    work_mode=IO_MAN;
-}
-static void io_set_net(void)
-{
-    work_mode=IO_NET;
 }
 static void __exit io_control_exit(void)
 {
