@@ -11,6 +11,8 @@
 #include <linux/interrupt.h>
 #include <asm/gpio.h>
 #include <asm/uaccess.h>
+#include <mach/irq.h>
+#include <mach/gpio.h>
 
 struct io_control_driver
 {
