@@ -40,6 +40,9 @@ int main(int argc,char*argv[])
     }
     fd_set r_fds;
     fd_set w_fds;
+    struct timeval timeout;
+    timeout.tv_sec=0;
+    timeout.tv_usec=100000;
     int panel=20000;
     while(1)
     {
@@ -75,10 +78,18 @@ int main(int argc,char*argv[])
             read(fd,&r_buf,sizeof(r_buf));
         }
         else
-        {    
-            int len=2;
-            recvfrom(client_socket_fd,r_buf,sizeof(r_buf),0,(struct sockaddr*)&svr_addr,&len);
-            val=r_buf[1];
+        {   
+            int len=sizeof(svr_addr);
+            char trig[1];
+            trig[0]='w';
+            sendto(client_socket_fd,trig,1,0,(struct sockaddr*)&svr_addr,len); 
+            FD_ZERO(&r_fds);
+            FD_SET(client_socket_fd,&r_fds);
+            if(select(client_socket_fd+1,&r_fds,NULL,NULL,&timeout)>0)
+            {
+                recvfrom(client_socket_fd,r_buf,sizeof(r_buf),0,(struct sockaddr*)&svr_addr,&len);
+                val=r_buf[1];
+            }
         }
         if(r_buf[0]=='r')
         {
