@@ -31,20 +31,30 @@ class Frame(wx.Frame):
         self.Bind(wx.EVT_BUTTON,self.OnClickRight,self.bt_right)
         self.Bind(wx.EVT_BUTTON,self.OnClickQuit,self.bt_quit)
         self.skt=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
+        self.skt.setblocking(0)
         self.skt.bind(('0.0.0.0',7777))
     #Model
     def OnClickLeft(self,event):
         self.txt_output.SetLabel("LEFT")
-        data,addr=self.skt.recvfrom(1)
-        for i in range(1,20):
-            self.skt.sendto('l'+chr(80),addr)
-        print 'left'
+        try:
+            data,addr=self.skt.recvfrom(1)
+            print '%s:%s'%(data,addr)
+            for i in range(1,20):
+                self.skt.sendto('l'+chr(80),addr)
+            print 'left'
+        except:
+            pass
     def OnClickRight(self,event): 
         self.txt_output.SetLabel("RIGHT")
         data,addr=self.skt.recvfrom(1)
-        for i in range(1,20):
-            self.skt.sendto('r'+chr(80),addr)
-        print 'right'
+        try:
+            data,addr=self.skt.recvfrom(1)
+            print '%s:%s'%(data,addr)
+            for i in range(1,20):
+                self.skt.sendto('r'+chr(80),addr)
+            print 'right'
+        except:
+            pass
     def OnClickQuit(self,event):
         self.Close(True)
     def OnExit(self):

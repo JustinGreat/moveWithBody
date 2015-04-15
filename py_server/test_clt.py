@@ -15,7 +15,8 @@ def Start1():
 def Start():
     s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
     s.setblocking(0)
-    while True:
+   # while True:
+    for i in range(1,10):
         s.sendto('w',('localhost',7777))
         try:
             data,addr=s.recvfrom(2)
