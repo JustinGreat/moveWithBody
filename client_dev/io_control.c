@@ -14,6 +14,9 @@
 #include <mach/irq.h>
 #include <mach/gpio.h>
 
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("JustinGreat");
+
 struct io_control_driver
 {
 	unsigned int dev_major;
@@ -216,6 +219,4 @@ static void __exit io_control_exit(void)
 module_init(io_control_init);
 module_exit(io_control_exit);
 
-MODULE_LICENSE("GPL");
-MODULE_AUTHOR("JustinGreat");
 
