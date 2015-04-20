@@ -18,7 +18,7 @@
 #define PANEL_HALF_RANGE 19800
 #define PANEL_RIGHT PANEL_CENTER+PANEL_HALF_RANGE
 #define PANEL_LEFT  PANEL_CENTER-PANEL_HALF_RANGE
-#define SVR_PORT 6666
+#define SVR_PORT 7777
 #define SVR_IP  "192.168.1.108"
 
 struct sockaddr_in svr_addr;
